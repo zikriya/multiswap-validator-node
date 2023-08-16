@@ -15,8 +15,8 @@ let awsSecretsManager = async function () {
           if ("SecretString" in data) {
             let secret = data.SecretString;
             var secretJson = JSON.parse(secret);
-            (global as any).SECRETS = {
-              ...(global as any).SECRETS,
+            (global as any).AWS_ENVIRONMENT = {
+              ...(global as any).AWS_ENVIRONMENT,
               ...secretJson,
             };
           } else {
