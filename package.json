@@ -45,6 +45,7 @@
     "moment": "^2.29.4",
     "moment-range": "^4.0.2",
     "node-cron": "^2.0.3",
-    "@cosmjs/cosmwasm-stargate": "^0.30.1"
+    "@cosmjs/cosmwasm-stargate": "^0.30.1",
+    "eth-sig-util": "^3.0.1"
   }
 }
