@@ -105,16 +105,14 @@ async function workerForSignatureVarification(job: any) {
     console.info("decodedData", decodedData);
 
     if (job.data.isDestinationNonEVM != null && job.data.isDestinationNonEVM) {
-      if (cosmWasmService.validateSignature(job)) {
-        signedData = await cosmWasmService.signedTransaction(
-          job,
-          decodedData,
-          tx
-        );
+      let sd = await cosmWasmService.signedTransaction(job, decodedData, tx);
+      if (cosmWasmService.validateSignature(job, sd.signatures)) {
+        signedData = sd;
       }
     } else {
-      if (web3Service.validateSignature(job)) {
-        signedData = await web3Service.signedTransaction(job, decodedData, tx);
+      let sd = await web3Service.signedTransaction(job, decodedData, tx);
+      if (web3Service.validateSignature(job, sd.signatures)) {
+        signedData = sd;
       }
     }
 
