@@ -1,4 +1,8 @@
 var axios = require("axios").default;
+import {
+  createAuthTokenForMultiswapBackend,
+  BEARER,
+} from "../constants/constants";
 
 export let getTransactions = async function () {
   try {
@@ -7,8 +11,13 @@ export let getTransactions = async function () {
     if (process.env.ENVIRONMENT == "local") {
       baseUrl = "http://localhost:8080";
     }
-    let url = `${baseUrl}/api/v1/transactions/list?status=generatorSignatureCreated&address=${process.env.PUBLIC_KEY}&isPagination=false&limit=1`;
-    let res = await axios.get(url);
+    let config = {
+      headers: {
+        Authorization: BEARER + createAuthTokenForMultiswapBackend(),
+      },
+    };
+    let url = `${baseUrl}/api/v1/transactions/list?status=generatorSignatureCreated&address=${process.env.PUBLIC_KEY}&isPagination=false&isFrom=validator`;
+    let res = await axios.get(url, config);
     return res.data.body.transactions;
   } catch (error) {
     console.log(error);
@@ -24,7 +33,7 @@ export const updateTransactionJobStatus = async (txHash: string, body: any) => {
   }
   let config = {
     headers: {
-      Authorization: "",
+      Authorization: BEARER + createAuthTokenForMultiswapBackend(),
     },
   };
   return axios.put(
