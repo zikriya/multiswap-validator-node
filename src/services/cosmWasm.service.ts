@@ -2,7 +2,11 @@ import Web3 from "web3";
 import { TransactionReceipt, Transaction } from "../interfaces";
 const { SigningCosmWasmClient } = require("@cosmjs/cosmwasm-stargate");
 import { Wallet, ethers } from "ethers";
-import { CUDOS_CHAIN_ID, THRESHOLD } from "../constants/constants";
+import {
+  CUDOS_CHAIN_ID,
+  THRESHOLD,
+  getPrivateKey,
+} from "../constants/constants";
 import { recoverPersonalSignature } from "eth-sig-util";
 
 export const getTransactionReceipt = async (
@@ -89,7 +93,7 @@ const createSignedPayment = async (
     salt
   );
 
-  const privateKey = process.env.PRIVATE_KEY as string;
+  const privateKey = getPrivateKey();
   let provider = ethers.getDefaultProvider(job.data.sourceRpcURL);
   const wallet = new Wallet(privateKey, provider);
   let signature = await wallet.signMessage(payBySig.hash);
