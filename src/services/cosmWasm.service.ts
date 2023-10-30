@@ -136,6 +136,11 @@ export const getLogsFromTransactionReceipt = (job: any) => {
     decodedData.targetToken = filterLogsAndGetValue(logs, "target_token");
     decodedData.targetAddress = filterLogsAndGetValue(logs, "target_address");
     decodedData.from = filterLogsAndGetValue(logs, "from");
+    decodedData.swapBridgeAmount = filterLogsAndGetValue(
+      logs,
+      "swap_bridge_amount"
+    );
+
     return decodedData;
   } catch (error) {
     console.error("Error occured while getting logs from transaction", error);
@@ -158,8 +163,8 @@ export const filterLogsAndGetValue = (logs: any, key: string) => {
 };
 
 const getDestinationAmount = async (data: any) => {
-  console.log("data.bridgeAmount", data.bridgeAmount);
-  return data.bridgeAmount;
+  console.log("data.bridgeAmount", data.swapBridgeAmount);
+  return data.swapBridgeAmount;
 };
 
 export const validateSignature = (job: any, localSignatures: any) => {
