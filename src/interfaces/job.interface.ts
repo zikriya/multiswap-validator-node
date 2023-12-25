@@ -1,4 +1,4 @@
-import { Transaction, TransactionReceipt } from '../interfaces';
+import { Transaction, TransactionReceipt } from "../interfaces";
 
 export interface JobRequestBody {
   name: string;
@@ -8,6 +8,7 @@ export interface JobRequestBody {
   isDestinationNonEVM: boolean;
   bridgeAmount: string;
   txId: string;
+  threshold: number;
 }
 
 export interface UpdateJobRequestBody {
