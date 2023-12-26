@@ -16,7 +16,9 @@ export let getTransactions = async function () {
         Authorization: BEARER + createAuthTokenForMultiswapBackend(),
       },
     };
-    let url = `${baseUrl}/api/v1/transactions/list?status=generatorSignatureCreated&address=${process.env.PUBLIC_KEY}&limit=20&nodeType=validator`;
+    let url = `${baseUrl}/api/v1/transactions/list?status=generatorSignatureCreated&address=${
+      (global as any).AWS_ENVIRONMENT.PUBLIC_KEY
+    }&limit=20&nodeType=validator`;
     let res = await axios.get(url, config);
     return res.data.body.transactions;
   } catch (error) {
@@ -25,7 +27,7 @@ export let getTransactions = async function () {
   }
 };
 
-export const updateTransactionJobStatus = async (txHash: string, body: any) => {
+export const updateTransaction = async (txHash: string, body: any) => {
   let baseUrl = (global as any as any).AWS_ENVIRONMENT
     .BASE_URL_MULTISWAP_BACKEND;
   if (process.env.ENVIRONMENT == "local") {
@@ -37,7 +39,9 @@ export const updateTransactionJobStatus = async (txHash: string, body: any) => {
     },
   };
   return axios.put(
-    `${baseUrl}/api/v1/transactions/update/from/validator/${txHash}?address=${process.env.PUBLIC_KEY}`,
+    `${baseUrl}/api/v1/transactions/update/from/validator/${txHash}?address=${
+      (global as any).AWS_ENVIRONMENT.PUBLIC_KEY
+    }`,
     body,
     config
   );

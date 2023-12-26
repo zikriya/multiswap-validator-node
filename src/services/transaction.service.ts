@@ -28,6 +28,7 @@ export async function fetchChainDataFromNetwork(tx: any) {
       sourceOneInchData: tx.sourceOneInchData,
       destinationOneInchData: tx.destinationOneInchData,
       expiry: tx.signatureExpiry,
+      targetToken: tx.destinationCabn.tokenContractAddress,
     };
 
     let job: any = { data: data, transaction: tx };
@@ -48,7 +49,7 @@ export async function fetchChainDataFromNetwork(tx: any) {
     }
 
     if (job?.returnvalue?.status == true) {
-      await verificationAndCreationSignature(job);
+      await verifyAndCreateSignature(job);
     } else {
       console.info(`failed!`);
       removeTransactionHashFromLocalList(job?.data?.txId);
@@ -56,7 +57,7 @@ export async function fetchChainDataFromNetwork(tx: any) {
   }
 }
 
-async function verificationAndCreationSignature(job: any) {
+async function verifyAndCreateSignature(job: any) {
   try {
     let decodedData;
     let tx: any = {};
@@ -105,7 +106,7 @@ async function verificationAndCreationSignature(job: any) {
 async function updateTransaction(job: any, signedData: any, tx: any) {
   try {
     console.log("signedData", job.returnvalue.status, signedData);
-    await axiosService.updateTransactionJobStatus(job?.data?.txId, {
+    await axiosService.updateTransaction(job?.data?.txId, {
       signedData,
       transaction: tx,
       transactionReceipt: job?.returnvalue,
