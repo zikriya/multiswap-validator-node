@@ -7,7 +7,7 @@ dotenv.config();
 
 (async () => {
   await awsSecretsManager();
-  // transactionsJob();
+  transactionsJob();
 })().catch((e) => {
   console.log(e);
 });

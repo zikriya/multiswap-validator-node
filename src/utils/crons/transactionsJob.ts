@@ -3,11 +3,9 @@ var cron = require("node-cron");
 import moment from "moment";
 import {
   axiosService,
-  web3Service,
-  cosmWasmService,
+  transactionService,
+  signatureService,
 } from "./../../services/index";
-import { JobRequestBody } from "./../../interfaces/index";
-import { getThreshold } from "../../constants/constants";
 let isProccessRunning = false;
 let localTransactionHashes: any = [];
 
@@ -37,114 +35,16 @@ async function triggerJobs() {
   if (transactions && transactions?.length > 0) {
     isProccessRunning = true;
     for (const transaction of transactions) {
-      addWorker(transaction);
+      handleJob(transaction);
     }
     isProccessRunning = false;
   }
 }
 
-export function addWorker(transaction: any) {
+export function handleJob(transaction: any) {
   if (isHashInLocalList(transaction.receiveTransactionId) == false) {
     addTransactionHashInLocalList(transaction.receiveTransactionId);
-    workerForFetchChainDataFromNetwork(transaction);
-  }
-}
-
-async function workerForFetchChainDataFromNetwork(tx: any) {
-  if (tx) {
-    let sourceNetwork = tx.sourceNetwork;
-    let destinationNetwork = tx.destinationNetwork;
-    let sourceRpc = sourceNetwork.multiswapNetworkFIBERInformation.rpcUrl;
-    let destinationRpc =
-      destinationNetwork.multiswapNetworkFIBERInformation.rpcUrl;
-
-    let data: JobRequestBody = {
-      name: "",
-      sourceRpcURL: sourceRpc,
-      isSourceNonEVM: sourceNetwork.isNonEVM,
-      destinationRpcURL: destinationRpc,
-      isDestinationNonEVM: destinationNetwork.isNonEVM,
-      bridgeAmount: tx.bridgeAmount,
-      txId: tx.receiveTransactionId,
-      threshold: sourceNetwork.threshold,
-    };
-
-    let job: any = { data: data, transaction: tx };
-
-    if (job.data.isSourceNonEVM) {
-      console.log("======================");
-      console.log("source is Non EVM");
-      job.returnvalue = await cosmWasmService.getTransactionReceipt(
-        job.data.txId,
-        job.data.sourceRpcURL
-      );
-    } else {
-      console.log("======================");
-      console.log("source is EVM");
-      job.returnvalue = await web3Service.getTransactionReceipt(
-        job.data.txId,
-        job.data.sourceRpcURL,
-        getThreshold(job.data.threshold)
-      );
-    }
-
-    if (job?.returnvalue?.status == true) {
-      await workerForSignatureVarification(job);
-    } else {
-      console.info(`failed!`);
-      removeTransactionHashFromLocalList(job?.data?.txId);
-    }
-  }
-}
-
-async function workerForSignatureVarification(job: any) {
-  try {
-    let decodedData;
-    let tx: any = {};
-    let signedData;
-    console.info(`completed!`);
-    if (job.data.isSourceNonEVM != null && job.data.isSourceNonEVM) {
-      decodedData = cosmWasmService.getLogsFromTransactionReceipt(job);
-      tx.from = decodedData.from;
-      tx.hash = job.returnvalue.transactionHash;
-    } else {
-      decodedData = web3Service.getLogsFromTransactionReceipt(job);
-      tx = await web3Service.getTransactionByHash(
-        job.data.txId,
-        job.data.sourceRpcURL
-      );
-    }
-    console.info("decodedData", decodedData);
-
-    if (job.data.isDestinationNonEVM != null && job.data.isDestinationNonEVM) {
-      let sd = await cosmWasmService.signedTransaction(job, decodedData, tx);
-      if (cosmWasmService.validateSignature(job, sd.signatures)) {
-        signedData = sd;
-      }
-    } else {
-      let sd = await web3Service.signedTransaction(job, decodedData, tx);
-      if (web3Service.validateSignature(job, sd.signatures)) {
-        signedData = sd;
-      }
-    }
-
-    await updateTransaction(job, signedData, tx);
-  } catch (error) {
-    console.error("error occured", error);
-  }
-}
-
-async function updateTransaction(job: any, signedData: any, tx: any) {
-  try {
-    console.log("signedData", job.returnvalue.status, signedData);
-    await axiosService.updateTransactionJobStatus(job?.data?.txId, {
-      signedData,
-      transaction: tx,
-      transactionReceipt: job?.returnvalue,
-    });
-    removeTransactionHashFromLocalList(job?.data?.txId);
-  } catch (error) {
-    console.error("error occured", error);
+    transactionService.fetchChainDataFromNetwork(transaction);
   }
 }
 
@@ -153,7 +53,7 @@ function addTransactionHashInLocalList(hash: any) {
   console.log(localTransactionHashes?.length);
 }
 
-function removeTransactionHashFromLocalList(hash: any) {
+export function removeTransactionHashFromLocalList(hash: any) {
   localTransactionHashes = localTransactionHashes?.filter(
     (item: string) => item !== hash
   );
