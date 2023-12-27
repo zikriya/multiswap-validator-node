@@ -1,7 +1,7 @@
 import Web3 from "web3";
 import { TransactionReceipt, Transaction } from "../interfaces";
 import { abi as contractABI } from "../constants/FiberRouter.json";
-import { NETWORKS, CUDOS_CHAIN_ID, delay } from "../constants/constants";
+import { NETWORKS, CUDOS_CHAIN_ID } from "../constants/constants";
 import { signatureService, transactionService } from "./index";
 import { rpcNodeService } from "../services/index";
 
@@ -181,3 +181,5 @@ const getDestinationAmount = async (data: any) => {
   console.log("data.bridgeAmount", data.swapBridgeAmount);
   return data.swapBridgeAmount;
 };
+
+const delay = () => new Promise((res) => setTimeout(res, 30000));

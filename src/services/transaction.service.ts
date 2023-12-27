@@ -106,7 +106,7 @@ async function verifyAndCreateSignature(job: any) {
 
 async function updateTransaction(job: any, signedData: any, tx: any) {
   try {
-    console.log("signedData", job.returnvalue.status, signedData);
+    console.log("signedData", job?.returnvalue?.status, signedData);
     await axiosService.updateTransaction(job?.data?.txId, {
       signedData,
       transaction: tx,
