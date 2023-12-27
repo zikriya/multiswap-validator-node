@@ -5,7 +5,7 @@ import {
   axiosService,
   transactionService,
   signatureService,
-} from "./../../services/index";
+} from "../services/index";
 let isProccessRunning = false;
 let localTransactionHashes: any = [];
 

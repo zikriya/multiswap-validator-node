@@ -64,7 +64,7 @@ export const signedTransaction = async (
       ...txData,
       signatures: [{ signature: payBySig.signatures, hash: payBySig.hash }],
       hash: payBySig.hash,
-      address: process.env.PUBLIC_KEY,
+      address: (global as any).AWS_ENVIRONMENT.PUBLIC_KEY,
     };
   } catch (error) {
     console.error("Error occured while decoding transaction", error);

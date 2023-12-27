@@ -1,5 +1,5 @@
 import { axiosService, web3Service } from "./index";
-import { removeTransactionHashFromLocalList } from "../utils/crons/transactionsJob";
+import { removeTransactionHashFromLocalList } from "../crons/transactionsJob";
 import { JobRequestBody } from "../interfaces/index";
 import { getThreshold } from "../constants/constants";
 import { signatureService } from "./index";
@@ -14,7 +14,6 @@ export async function fetchChainDataFromNetwork(tx: any) {
 
     let data: JobRequestBody = {
       name: "",
-      sourceRpcURL: sourceRpc,
       isSourceNonEVM: sourceNetwork.isNonEVM,
       destinationRpcURL: destinationRpc,
       isDestinationNonEVM: destinationNetwork.isNonEVM,
@@ -28,6 +27,9 @@ export async function fetchChainDataFromNetwork(tx: any) {
       sourceOneInchData: tx.sourceOneInchData,
       destinationOneInchData: tx.destinationOneInchData,
       expiry: tx.signatureExpiry,
+      targetToken: tx.destinationCabn.tokenContractAddress,
+      sourceChainId: sourceNetwork.chainId,
+      destinationChaibId: destinationNetwork.chainId,
     };
 
     let job: any = { data: data, transaction: tx };
@@ -42,13 +44,13 @@ export async function fetchChainDataFromNetwork(tx: any) {
       console.log("====================== source is EVM");
       job.returnvalue = await web3Service.getTransactionReceipt(
         job.data.txId,
-        job.data.sourceRpcURL,
+        job.data.sourceChainId,
         getThreshold(job.data.threshold)
       );
     }
 
     if (job?.returnvalue?.status == true) {
-      await verificationAndCreationSignature(job);
+      await verifyAndCreateSignature(job);
     } else {
       console.info(`failed!`);
       removeTransactionHashFromLocalList(job?.data?.txId);
@@ -56,7 +58,7 @@ export async function fetchChainDataFromNetwork(tx: any) {
   }
 }
 
-async function verificationAndCreationSignature(job: any) {
+async function verifyAndCreateSignature(job: any) {
   try {
     let decodedData;
     let tx: any = {};
@@ -69,7 +71,7 @@ async function verificationAndCreationSignature(job: any) {
       decodedData = web3Service.getLogsFromTransactionReceipt(job);
       tx = await web3Service.getTransactionByHash(
         job.data.txId,
-        job.data.sourceRpcURL
+        job.data.sourceChainId
       );
     }
     console.info("decodedData", decodedData);
@@ -104,8 +106,8 @@ async function verificationAndCreationSignature(job: any) {
 
 async function updateTransaction(job: any, signedData: any, tx: any) {
   try {
-    console.log("signedData", job.returnvalue.status, signedData);
-    await axiosService.updateTransactionJobStatus(job?.data?.txId, {
+    console.log("signedData", job?.returnvalue?.status, signedData);
+    await axiosService.updateTransaction(job?.data?.txId, {
       signedData,
       transaction: tx,
       transactionReceipt: job?.returnvalue,

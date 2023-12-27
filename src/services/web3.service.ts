@@ -1,16 +1,17 @@
 import Web3 from "web3";
 import { TransactionReceipt, Transaction } from "../interfaces";
 import { abi as contractABI } from "../constants/FiberRouter.json";
-import { NETWORKS, CUDOS_CHAIN_ID, delay } from "../constants/constants";
+import { NETWORKS, CUDOS_CHAIN_ID } from "../constants/constants";
 import { signatureService, transactionService } from "./index";
+import { rpcNodeService } from "../services/index";
 
 export const getTransactionReceipt = async (
   txId: string,
-  rpcURL: string,
+  chainId: string,
   threshold: number,
   tries = 0
 ): Promise<TransactionReceipt> => {
-  const web3 = new Web3(rpcURL);
+  const web3 = new Web3(rpcNodeService.getRpcNodeByChainId(chainId).url);
   const transaction: TransactionReceipt = await web3.eth.getTransactionReceipt(
     txId
   );
@@ -19,7 +20,7 @@ export const getTransactionReceipt = async (
     tries += 1;
     if (!transaction || transaction === null || transaction.status === null) {
       await delay();
-      await getTransactionReceipt(txId, rpcURL, threshold, tries);
+      await getTransactionReceipt(txId, chainId, threshold, tries);
     }
   }
   return transaction;
@@ -27,9 +28,9 @@ export const getTransactionReceipt = async (
 
 export const getTransactionByHash = async (
   txHash: string,
-  rpcURL: string
+  chainId: string
 ): Promise<Transaction> => {
-  const web3 = new Web3(rpcURL);
+  const web3 = new Web3(rpcNodeService.getRpcNodeByChainId(chainId).url);
   return web3.eth.getTransaction(txHash);
 };
 
@@ -40,7 +41,9 @@ export const signedTransaction = async (
   isForValidation: boolean
 ): Promise<any> => {
   try {
-    const web3 = new Web3(job.data.sourceRpcURL);
+    const web3 = new Web3(
+      rpcNodeService.getRpcNodeByChainId(job.data.sourceChainId).url
+    );
     const destinationAmountToMachine = await getDestinationAmount(decodedData);
     let txData = await signatureService.getDataForSignature(
       job,
@@ -76,7 +79,7 @@ export const signedTransaction = async (
       ...txData,
       signatures: [{ signature: signature.signature, hash: signature.hash }],
       hash: signature.hash,
-      address: process.env.PUBLIC_KEY,
+      address: (global as any).AWS_ENVIRONMENT.PUBLIC_KEY,
     };
   } catch (error) {
     console.error("Error occured while decoding transaction", error);
@@ -111,8 +114,9 @@ export const getLogsFromTransactionReceipt = (job: any) => {
     }
 
     if (logDataAndTopic?.data && logDataAndTopic.topics) {
-      const web3 = new Web3(job.data.sourceRpcURL);
-
+      const web3 = new Web3(
+        rpcNodeService.getRpcNodeByChainId(job.data.sourceChainId).url
+      );
       const decodedLog = web3.eth.abi.decodeLog(
         swapEventInputs as any,
         logDataAndTopic.data,
@@ -177,3 +181,5 @@ const getDestinationAmount = async (data: any) => {
   console.log("data.bridgeAmount", data.swapBridgeAmount);
   return data.swapBridgeAmount;
 };
+
+const delay = () => new Promise((res) => setTimeout(res, 30000));
