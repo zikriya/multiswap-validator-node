@@ -1,5 +1,5 @@
 import { axiosService, web3Service } from "./index";
-import { removeTransactionHashFromLocalList } from "../utils/crons/transactionsJob";
+import { removeTransactionHashFromLocalList } from "../crons/transactionsJob";
 import { JobRequestBody } from "../interfaces/index";
 import { getThreshold } from "../constants/constants";
 import { signatureService } from "./index";
@@ -14,7 +14,6 @@ export async function fetchChainDataFromNetwork(tx: any) {
 
     let data: JobRequestBody = {
       name: "",
-      sourceRpcURL: sourceRpc,
       isSourceNonEVM: sourceNetwork.isNonEVM,
       destinationRpcURL: destinationRpc,
       isDestinationNonEVM: destinationNetwork.isNonEVM,
@@ -29,6 +28,8 @@ export async function fetchChainDataFromNetwork(tx: any) {
       destinationOneInchData: tx.destinationOneInchData,
       expiry: tx.signatureExpiry,
       targetToken: tx.destinationCabn.tokenContractAddress,
+      sourceChainId: sourceNetwork.chainId,
+      destinationChaibId: destinationNetwork.chainId,
     };
 
     let job: any = { data: data, transaction: tx };
@@ -43,7 +44,7 @@ export async function fetchChainDataFromNetwork(tx: any) {
       console.log("====================== source is EVM");
       job.returnvalue = await web3Service.getTransactionReceipt(
         job.data.txId,
-        job.data.sourceRpcURL,
+        job.data.sourceChainId,
         getThreshold(job.data.threshold)
       );
     }
@@ -70,7 +71,7 @@ async function verifyAndCreateSignature(job: any) {
       decodedData = web3Service.getLogsFromTransactionReceipt(job);
       tx = await web3Service.getTransactionByHash(
         job.data.txId,
-        job.data.sourceRpcURL
+        job.data.sourceChainId
       );
     }
     console.info("decodedData", decodedData);
