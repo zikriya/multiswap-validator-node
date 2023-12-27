@@ -1,5 +1,4 @@
 import moment from "moment";
-import { RpcNode } from "../interfaces/index";
 var crypto = require("crypto");
 var CryptoJS = require("crypto-js");
 
@@ -9,7 +8,6 @@ export const CUDOS_CHAIN_ID = "cudos-1";
 export const FOUNDARY = "Foundary";
 export const ONE_INCH = "1Inch";
 export const BEARER = "Bearer ";
-let rpcNodes: [RpcNode];
 export const NETWORKS = [
   {
     chainId: "56",
