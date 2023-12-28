@@ -44,7 +44,6 @@ export const signedTransaction = async (
     const web3 = new Web3(
       rpcNodeService.getRpcNodeByChainId(job.data.sourceChainId).url
     );
-    const destinationAmountToMachine = await getDestinationAmount(decodedData);
     let txData = await signatureService.getDataForSignature(
       job,
       decodedData,
@@ -62,7 +61,7 @@ export const signedTransaction = async (
     const signature = signatureService.createSignedPayment(
       txData.targetChainId,
       txData.targetAddress,
-      destinationAmountToMachine,
+      txData.destinationAmountIn,
       txData.targetToken,
       txData.fundManagerContractAddress,
       txData.salt,
