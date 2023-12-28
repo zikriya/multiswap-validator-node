@@ -30,6 +30,7 @@ export async function fetchChainDataFromNetwork(tx: any) {
       targetToken: tx.destinationCabn.tokenContractAddress,
       sourceChainId: sourceNetwork.chainId,
       destinationChaibId: destinationNetwork.chainId,
+      slippage: tx.slippage,
     };
 
     let job: any = { data: data, transaction: tx };

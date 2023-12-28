@@ -18,6 +18,7 @@ export interface JobRequestBody {
   targetToken: string;
   sourceChainId: string;
   destinationChaibId: string;
+  slippage: number;
 }
 
 export interface UpdateJobRequestBody {
