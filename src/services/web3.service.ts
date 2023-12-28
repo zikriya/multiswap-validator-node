@@ -23,7 +23,7 @@ export const getTransactionReceipt = async (
       await getTransactionReceipt(txId, chainId, threshold, tries);
     }
   }
-  return transaction;
+  return await web3.eth.getTransactionReceipt(txId);
 };
 
 export const getTransactionByHash = async (
