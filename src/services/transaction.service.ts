@@ -35,14 +35,11 @@ export async function fetchChainDataFromNetwork(tx: any) {
 
     let job: any = { data: data, transaction: tx };
     if (job.data.isSourceNonEVM) {
-      // console.log("======================");
-      // console.log("source is Non EVM");
       // job.returnvalue = await cosmWasmService.getTransactionReceipt(
       //   job.data.txId,
       //   job.data.sourceRpcURL
       // );
     } else {
-      console.log("====================== source is EVM");
       job.returnvalue = await web3Service.getTransactionReceipt(
         job.data.txId,
         job.data.sourceChainId,
@@ -107,7 +104,6 @@ async function verifyAndCreateSignature(job: any) {
 
 async function updateTransaction(job: any, signedData: any, tx: any) {
   try {
-    console.log("signedData", job?.returnvalue?.status, signedData);
     await axiosService.updateTransaction(job?.data?.txId, {
       signedData,
       transaction: tx,
@@ -124,7 +120,6 @@ export const getGeneratorHash = (tx: any): string => {
     let signatures = tx?.generatorSig?.signatures;
     if (signatures?.length > 0) {
       let signature = signatures[0];
-      console.log("signature.hash", signature.hash);
       return signature.hash;
     }
   } catch (e) {

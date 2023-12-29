@@ -157,7 +157,6 @@ export const filterLogsAndGetValue = (logs: any, key: string) => {
 };
 
 const getDestinationAmount = async (data: any) => {
-  console.log("data.bridgeAmount", data.swapBridgeAmount);
   return data.swapBridgeAmount;
 };
 
@@ -195,7 +194,6 @@ export const isRecoverAddressValid = (
       data: data,
       sig: "0x" + signature,
     });
-    console.log("cosm public address is:::", address);
     if (
       address.toLowerCase() ==
       (global as any).AWS_ENVIRONMENT.GENERATOR_PUBLIC_KEY.toLowerCase()
