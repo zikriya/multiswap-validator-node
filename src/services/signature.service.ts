@@ -72,16 +72,6 @@ export const getValidWithdrawalData = async (
       data.sourceAssetType +
       data.destinationAssetType
   );
-  console.log(
-    "data",
-    data.destinationAmountIn,
-    data.destinationAmountOut,
-    data.sourceAssetType,
-    data.destinationAssetType,
-    decodedData.settledAmount
-  );
-  console.log("latestHash", latestHash);
-  console.log("withdrawlDataHash", decodedData.withdrawalData);
   if (
     latestHash == decodedData.withdrawalData &&
     (await isValidSettledAmount(
@@ -133,10 +123,8 @@ export const isValidSettledAmount = async (
   );
   settledAmount = decimalsIntoNumber(settledAmount, sDecimal);
   destinationAmountIn = decimalsIntoNumber(destinationAmountIn, dDecimal);
-  let minValue = withSlippage(destinationAmountIn, slippage);
-  let maxValue = destinationAmountIn;
-  console.log(minValue, settledAmount, maxValue);
-  if (settledAmount >= minValue && settledAmount <= maxValue) {
+  console.log(settledAmount, destinationAmountIn);
+  if (settledAmount >= destinationAmountIn) {
     return true;
   }
   return false;
@@ -339,7 +327,6 @@ export const isRecoverAddressValid = (
     const pubKey = ecrecover(toBuffer(hash), v, r, s);
     const addrBuf = pubToAddress(pubKey);
     const address = bufferToHex(addrBuf);
-    console.log("public address is:::", address);
     if (isAllowedPublicAddress(address.toLowerCase())) {
       return true;
     }

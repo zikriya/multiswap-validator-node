@@ -57,7 +57,6 @@ export const signedTransaction = async (
         transactionService.getGeneratorHash(job.transaction)
       )
     );
-    console.log(txData);
     const signature = signatureService.createSignedPayment(
       txData.targetChainId,
       txData.targetAddress,
@@ -166,7 +165,6 @@ export const getFoundaryTokenAddress = (chainId: string) => {
 };
 
 const getDestinationAmount = async (data: any) => {
-  console.log("data.bridgeAmount", data.swapBridgeAmount);
   return data.swapBridgeAmount;
 };
 
