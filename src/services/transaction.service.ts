@@ -72,7 +72,6 @@ async function verifyAndCreateSignature(job: any) {
         job.data.sourceChainId
       );
     }
-    console.info("decodedData", decodedData);
 
     if (job.data.isDestinationNonEVM != null && job.data.isDestinationNonEVM) {
       // let sd = await cosmWasmService.signedTransaction(job, decodedData, tx);
