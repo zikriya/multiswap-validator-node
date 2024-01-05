@@ -15,7 +15,7 @@ let transactionsJob = async function () {
 
 async function start() {
   try {
-    let task = cron.schedule("*/20 * * * * *", async () => {
+    let task = cron.schedule("*/5 * * * * *", async () => {
       if (!isProccessRunning) {
         triggerJobs();
       }
