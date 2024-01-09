@@ -340,14 +340,41 @@ export const isRecoverAddressValid = (
 export const getDataForSalt = (
   isForValidation: boolean,
   txData: any,
-  generatorHash: string
+  generatorHash: string,
+  decodedData: any
 ): string => {
   try {
     if (isForValidation) {
-      return txData.transactionHash.toLocaleLowerCase();
+      return (
+        txData.transactionHash.toLocaleLowerCase() +
+        getDecodedLogsDataIntoString(decodedData)
+      );
     } else {
-      return txData.transactionHash.toLocaleLowerCase() + generatorHash;
+      return (
+        txData.transactionHash.toLocaleLowerCase() +
+        getDecodedLogsDataIntoString(decodedData) +
+        generatorHash
+      );
     }
+  } catch (e) {
+    console.log(e);
+  }
+  return "";
+};
+
+const getDecodedLogsDataIntoString = (decodedData: any): string => {
+  try {
+    return (
+      decodedData?.sourceToken +
+      decodedData?.targetToken +
+      decodedData?.sourceChainId +
+      decodedData?.targetChainId +
+      decodedData?.sourceAmount +
+      decodedData?.sourceAddress +
+      decodedData?.targetAddress +
+      decodedData?.settledAmount +
+      decodedData?.withdrawalData
+    );
   } catch (e) {
     console.log(e);
   }
