@@ -23,7 +23,11 @@ export const getTransactionReceipt = async (
       await getTransactionReceipt(txId, chainId, threshold, tries);
     }
   }
-  return await web3.eth.getTransactionReceipt(txId);
+  return await checkValidTransactionAndReturnReceipt(
+    txId,
+    chainId,
+    await web3.eth.getTransactionReceipt(txId)
+  );
 };
 
 export const getTransactionByHash = async (
@@ -54,7 +58,8 @@ export const signedTransaction = async (
       signatureService.getDataForSalt(
         isForValidation,
         txData,
-        transactionService.getGeneratorHash(job.transaction)
+        transactionService.getGeneratorHash(job.transaction),
+        decodedData
       )
     );
     const signature = signatureService.createSignedPayment(
@@ -166,6 +171,24 @@ export const getFoundaryTokenAddress = (chainId: string) => {
 
 const getDestinationAmount = async (data: any) => {
   return data.swapBridgeAmount;
+};
+
+export const checkValidTransactionAndReturnReceipt = async (
+  txId: string,
+  chainId: string,
+  receipt: TransactionReceipt
+): Promise<any> => {
+  let transaction = await getTransactionByHash(txId, chainId);
+  if (
+    transaction &&
+    transaction.to &&
+    receipt &&
+    transaction.to.toLowerCase() == getFiberRouterAddress(chainId).toLowerCase()
+  ) {
+    console.log("transaction to address", transaction?.to, receipt?.status);
+    return receipt;
+  }
+  return null;
 };
 
 const delay = () => new Promise((res) => setTimeout(res, 30000));
