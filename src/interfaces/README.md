@@ -4,107 +4,114 @@ The `index.ts` file within the `src/interfaces` directory of the `ferrumnet/mult
 
 # job.interface.ts
 
-### `JobRequestBody`
+The file `job.interface.ts` from the repository contains several TypeScript interfaces that define the structure for job request bodies and RPC nodes in the MultiSwap Validator Node system. Here's a detailed breakdown of each interface:
 
-This interface represents the body of a job request. It is structured to contain all necessary information needed to process a job:
+### 1\. `JobRequestBody` Interface
 
--   `name`: A string representing the name of the job.
--   `isSourceNonEVM`: A boolean indicating if the source blockchain is a non-EVM (Ethereum Virtual Machine) compatible blockchain.
--   `destinationRpcURL`: A string specifying the RPC URL of the destination blockchain.
--   `isDestinationNonEVM`: A boolean indicating if the destination blockchain is a non-EVM compatible blockchain.
--   `bridgeAmount`: A string representing the amount to be bridged.
--   `txId`: A string that represents the transaction ID.
--   `threshold`: A number indicating the threshold for something (not explicitly mentioned, but typically thresholds are used for validations or limits).
--   `sourceAssetType`: A string representing the type of asset in the source chain.
--   `destinationAssetType`: A string representing the type of asset in the destination chain.
--   `destinationAmountIn`: A string representing the amount of the asset before conversion in the destination chain.
--   `destinationAmountOut`: A string representing the amount of the asset after conversion in the destination chain.
--   `sourceOneInchData`: A string containing data for executing swaps via 1inch on the source chain.
--   `destinationOneInchData`: A string containing data for executing swaps via 1inch on the destination chain.
--   `targetToken`: A string representing the token targeted for the swap.
--   `sourceChainId`: A string representing the ID of the source blockchain.
--   `destinationChaibId`: A string (with a typo, should be `destinationChainId`) representing the ID of the destination blockchain.
--   `slippage`: A number indicating the allowed slippage percentage for the transaction.
+This interface represents the structure for the request body when creating or updating a job. It includes various fields pertinent to job transactions:
 
-### `UpdateJobRequestBody`
+-   `name`: A `string` indicating the name of the job.
+-   `isSourceNonEVM`: A `boolean` indicating whether the source chain is a non-EVM (Ethereum Virtual Machine) chain.
+-   `destinationRpcURL`: A `string` with the RPC URL of the destination chain.
+-   `isDestinationNonEVM`: A `boolean` indicating whether the destination chain is non-EVM.
+-   `bridgeAmount`: A `string` representing the amount to bridge.
+-   `txId`: A `string` representing the transaction ID.
+-   `threshold`: A `number` representing the threshold amount for the transaction.
+-   `sourceAssetType`: A `string` detailing the type of asset on the source chain.
+-   `destinationAssetType`: A `string` detailing the type of asset on the destination chain.
+-   `destinationAmountIn`: A `string` representing the input amount on the destination.
+-   `destinationAmountOut`: A `string` representing the output amount on the destination.
+-   `sourceOneInchData`: A `string` for 1inch API data related to the source.
+-   `destinationOneInchData`: A `string` for 1inch API data related to the destination.
+-   `expiry`: A `number` representing the expiration time of the job.
+-   `targetToken`: A `string` identifying the target token.
+-   `sourceChainId`: A `string` for the source blockchain's chain ID.
+-   `destinationChaibId`: A `string` for the destination blockchain's chain ID (Note: This seems like a typo, it should likely be `destinationChainId`).
+-   `slippage`: A `number` representing the allowed slippage for the transaction.
 
-This interface is designed to update a job request with transaction details:
+### 2\. `UpdateJobRequestBody` Interface
 
--   `transaction`: An object of type `Transaction` representing the transaction details.
--   `transactionReceipt`: An object of type `TransactionReceipt` representing the receipt of the transaction.
+This interface is used for updating a job with transaction details:
 
-### `RpcNode`
+-   `transaction`: An object of type `Transaction` containing transaction details.
+-   `transactionReceipt`: An object of type `TransactionReceipt` containing the receipt of the transaction.
 
-Defines the structure for an RPC node configuration:
+### 3\. `RpcNode` Interface
 
--   `url`: A string specifying the RPC URL of the node.
--   `chainId`: A string representing the blockchain ID the node connects to.
+Defines the structure for RPC (Remote Procedure Call) nodes:
 
-These interfaces are crucial for ensuring type safety and consistency within the application, especially when handling job requests that involve transactions across blockchains.
+-   `url`: A `string` representing the URL of the RPC node.
+-   `chainId`: A `string` representing the chain ID of the blockchain associated with the RPC node.
+
+This documentation outlines the data structures used for handling job transactions within the MultiSwap Validator Node system, emphasizing the integrative role of non-EVM and EVM chains in transaction processes.
 
 # web3.interface.ts
 
-### `Transaction` Interface
+The file `web3.interface.ts` from the `ferrumnet/multiswap-validator-node` repository contains TypeScript interfaces that define the structure of objects related to Ethereum blockchain transactions. Here is a detailed documentation of each interface in the file:
 
-This interface represents a blockchain transaction and includes the following properties:
+### Interface: `Transaction`
 
--   `hash`: The unique identifier of the transaction as a string.
--   `nonce`: The nonce of the transaction, indicating the number of transactions sent from the sender's address.
--   `blockHash`: The hash of the block that contains this transaction. It is null if the transaction is pending.
--   `blockNumber`: The number of the block that contains this transaction. It is null if the transaction is pending.
--   `transactionIndex`: The index of the transaction in the block. It is null if the transaction is pending.
--   `from`: The address of the sender.
--   `to`: The address of the receiver. It can be null for contract creation transactions.
--   `value`: The amount of Ether (in wei) transferred in the transaction.
--   `gasPrice`: The gas price provided by the sender in wei.
--   `maxPriorityFeePerGas`: An optional field representing the maximum priority fee per gas that the transaction may pay. This property is part of EIP-1559.
--   `maxFeePerGas`: An optional field representing the maximum fee per gas that the sender is willing to pay, including the base fee and priority fee. This property is also part of EIP-1559.
--   `gas`: The amount of gas provided for the transaction.
--   `input`: The data sent along with the transaction.
+Defines the structure of an Ethereum transaction.
 
-### `TransactionReceipt` Interface
+-   `hash`: A string representing the unique hash of the transaction.
+-   `nonce`: A number that represents the number of transactions sent from the sender's address.
+-   `blockHash`: A string or null, representing the hash of the block containing the transaction; null if the transaction is pending.
+-   `blockNumber`: A number or null, representing the block number containing the transaction; null if the transaction is pending.
+-   `transactionIndex`: A number or null, indicating the index position of the transaction in the block.
+-   `from`: A string representing the address of the sender.
+-   `to`: A string or null, representing the address of the receiver. Null if it's a contract creation transaction.
+-   `value`: A string representing the amount of Ether transferred in Wei.
+-   `gasPrice`: A string representing the gas price set by the sender in Wei.
+-   `maxPriorityFeePerGas`: An optional number, string, or any type, representing the maximum priority fee per gas offered.
+-   `maxFeePerGas`: An optional number, string, or any type, representing the maximum fee per gas offered.
+-   `gas`: A number indicating the amount of gas provided for the transaction.
+-   `input`: A string representing the data sent along with the transaction.
 
-This interface represents the receipt of a transaction, containing details about the execution outcome and is defined with the following properties:
+### Interface: `TransactionReceipt`
 
--   `status`: A boolean indicating whether the transaction was successful.
--   `transactionHash`: The hash of the transaction.
--   `transactionIndex`: The transaction's index position in the block.
--   `blockHash`: The hash of the block where this transaction was in.
--   `blockNumber`: The block number where this transaction was in.
--   `from`: The sender's address.
--   `to`: The receiver's address.
--   `contractAddress`: The contract address created if the transaction was a contract creation, otherwise undefined.
--   `cumulativeGasUsed`: The total amount of gas used when this transaction was executed in the block.
--   `gasUsed`: The amount of gas used by this specific transaction alone.
--   `effectiveGasPrice`: The effective gas price used for this transaction.
--   `logs`: An array of log objects generated during the execution of the transaction.
--   `logsBloom`: The bloom filter for the logs of the block.
--   `events`: An optional property that may contain the events generated during the execution if they are present.
+Defines the structure of a transaction receipt, which is the outcome of a transaction.
 
-### `EventLog` Interface
+-   `status`: A boolean indicating if the transaction was successful.
+-   `transactionHash`: A string representing the hash of the transaction.
+-   `transactionIndex`: A number indicating the position of the transaction within the block.
+-   `blockHash`: A string representing the hash of the block containing the transaction.
+-   `blockNumber`: A number representing the block number containing the transaction.
+-   `from`: A string representing the sender's address.
+-   `to`: A string representing the receiver's address.
+-   `contractAddress`: An optional string representing the contract address created, if the transaction was a contract creation.
+-   `cumulativeGasUsed`: A number indicating the total gas used in the block containing the transaction.
+-   `gasUsed`: A number representing the amount of gas used by the transaction.
+-   `effectiveGasPrice`: A number representing the effective gas price paid.
+-   `logs`: An array of `Log` objects representing the logs produced by the transaction.
+-   `logsBloom`: A string representing the bloom filter of the logs.
+-   `events`: An optional dictionary of event names to `EventLog` objects that were emitted.
 
-This interface describes an event log from the blockchain, which includes:
+### Interface: `EventLog`
 
--   `event`: The name of the event.
--   `address`: The address from which this log originated.
--   `returnValues`: The values returned by the event.
--   `logIndex`: The log index position in the block.
--   `transactionIndex`: The index of the transaction in the block.
--   `transactionHash`: The hash of the transaction that generated this log.
--   `blockHash`: The hash of the block where this log was generated.
--   `blockNumber`: The block number where this log was generated.
--   `raw`: An optional property that contains the raw data (`data`) and `topics` of the log.
+Represents an event log from a transaction.
 
-### `Log` Interface
+-   `event`: A string representing the name of the event.
+-   `address`: A string representing the address where the event occurred.
+-   `returnValues`: Any type, representing the values returned by the event.
+-   `logIndex`: A number indicating the log index position.
+-   `transactionIndex`: A number indicating the transaction's index position in the block.
+-   `transactionHash`: A string representing the hash of the transaction.
+-   `blockHash`: A string representing the hash of the block containing the event.
+-   `blockNumber`: A number indicating the block number of the event.
+-   `raw`: An optional object containing `data`, a string, and `topics`, an array of any type.
 
-Represents a low-level log item, similar to `EventLog` but without the `event` property, used in the Ethereum Virtual Machine (EVM) logs:
+### Interface: `Log`
 
--   `address`: The address from which this log originated.
--   `data`: The data sent with the log.
--   `topics`: An array of topics associated with the log.
--   `logIndex`: The log index position in the block.
--   `transactionIndex`: The index of the transaction in the block.
--   `transactionHash`: The hash of the transaction.
--   `blockHash`: The hash of the block.
--   `blockNumber`: The block number.
+Defines the structure of a log entry.
+
+-   `address`: A string representing the address that generated the log.
+-   `data`: A string containing the logged data.
+-   `topics`: An array of strings representing the topics of the log.
+-   `logIndex`: A number indicating the log's index position within the block.
+-   `transactionIndex`: A number indicating the transaction's index position within the block.
+-   `transactionHash`: A string representing the hash of the transaction that generated the log.
+-   `blockHash`: A string representing the hash of the block containing the log.
+-   `blockNumber`: A number indicating the block number of the log.
 -   `removed`: A boolean indicating if the log was removed due to a chain reorganization.
+
+These interfaces are crucial for applications interacting with Ethereum, providing a structured way to handle data related to transactions and their outcomes.

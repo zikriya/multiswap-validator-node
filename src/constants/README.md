@@ -1,56 +1,31 @@
 # constants.ts
-NAME: Identifier for the fund manager, set to "FUND_MANAGER".
 
-VERSION: Version of the constants, set to "000.004".
+Here is the detailed documentation for each function and constant in the `constants.ts` file from the repository:
 
-CUDOS_CHAIN_ID: Chain ID for the Cudos network, set to "cudos-1".
+### Constants
 
-FOUNDARY: Label for Foundary, set to "Foundary".
+-   `NAME`: Represents the name of the fund manager system, set to `"FUND_MANAGER"`.
+-   `VERSION`: Current version of the system, set to `"000.004"`.
+-   `CUDOS_CHAIN_ID`: Specifies the chain ID for the Cudos network, set to `"cudos-1"`.
+-   `FOUNDARY`: A label used within the system, set to `"Foundary"`.
+-   `ONE_INCH`: A label representing the 1Inch exchange, set to `"1Inch"`.
+-   `BEARER`: Prefix for bearer tokens, set to `"Bearer "`.
+-   `NETWORKS`: An array of network configurations each containing `chainId`, `fundManagerAddress`, `fiberRouterAddress`, and `foundaryTokenAddress`.
 
-ONE_INCH: Identifier for the 1Inch network, set to "1Inch".
+### Functions
 
-SECURITY_KEY: A placeholder for security keys, initially set to an empty string.
+-   `getSecurityKey`: Combines AWS environment security key and a process environment variable to form a complete security key.
+-   `getPrivateKey`: Retrieves and decrypts the private key from environment variables using the security key obtained from `getSecurityKey()`.
+-   `createAuthTokenForMultiswapBackend`: Generates a time-based authentication token for interacting with the multiswap backend. It creates a token valid from one minute before to one minute after its creation time.
+-   `encrypt`: Encrypts a given string data with a specified key using AES encryption from the CryptoJS library.
+-   `decrypt`: Decrypts AES encrypted data using a specified key to retrieve the original string.
+-   `getThreshold`: Returns twice the given threshold value. This could be used for setting limits or thresholds in operations.
+-   `isAllowedPublicAddress`: Checks if a given node address is included in the allowed addresses from the AWS environment configuration.
+-   `getRpcNodesData`: Retrieves and parses the RPC nodes data from the AWS environment settings.
 
-BEARER: Prefix for bearer tokens, set to "Bearer ".
-
-Network Configurations
-
-NETWORKS: An array of network configurations, each including:
-
-chainId: Identifier for the blockchain network.
-
-fundManagerAddress: Address of the fund manager contract on the network.
-
-fiberRouterAddress: Address of the fiber router contract on the network.
-
-foundaryTokenAddress: Address of the Foundary token contract on the network.
-
-Utility Functions
-
-getSecurityKey(): Generates a security key based on environment variables.
-
-getPrivateKey(): Decrypts and retrieves the private key from environment variables using the security key.
-
-createAuthTokenForMultiswapBackend(): Generates an encrypted authentication token for the multiswap backend. It includes a time frame and a random key for security.
-
-encrypt(data, key): Encrypts data using AES encryption with a given key.
-
-decrypt(data, key): Decrypts data encrypted with AES using the given key.
-
-getThreshold(threshold): Calculates a new threshold value by doubling the input threshold.
-
-getExpiry(): Computes the expiry time set to one week from the current moment in Unix timestamp.
-
-setRpcNodesData(data): Stores the provided RPC nodes data.
-
-getRpcNodesData(): Retrieves the stored RPC nodes data.
-
-Security and Data Handling
-
-This file incorporates critical functionality for security, such as encryption and decryption of sensitive data, and generation of authentication tokens. The usage of environment variables suggests a design that keeps sensitive information out of the codebase, which is a best practice for security.
+This documentation outlines the purpose and functionality of each component in the `constants.ts` file, which seems to be integral to the configuration and operation of a multiswap validator node within the Ferrum network.
 
 # IERC20
-Overview
 
 The IERC20.json file defines the interface for a standard ERC20 token, adhering to the Ethereum token standard specification. This interface includes essential functionalities for token transactions, including transfers, approvals, and balance checks.
 
@@ -142,3 +117,142 @@ Details: This event is emitted after a successful swap operation, detailing the 
 Conclusion
 
 The FiberRouter.json file defines an interface for a contract facilitating token swaps on a blockchain network, providing methods for exact or minimum token swaps along specified paths. It also includes an event to log swap operations. This documentation should assist auditors in understanding the contract's functionalities and intended behaviors.
+
+# utils.ts
+
+Here's the detailed documentation for each function found in the `utils.ts` file of the `multiswap-validator-node` repository:
+
+### 1\. erc20 function
+
+typescriptCopy code
+
+`const erc20 = (web3: any, token: string) => {
+  return new web3.eth.Contract(erc20Abi as any, token);
+};`
+
+Parameters:
+
+-   `web3`: A web3 instance used to interact with Ethereum blockchain.
+-   `token`: The contract address of the ERC20 token.
+
+Returns: An instance of the web3.eth.Contract for the specified token using the ERC20 ABI.
+
+Description: This function creates and returns a web3.eth.Contract instance for a given ERC20 token address, facilitating interactions with the smart contract.
+
+### 2\. decimals function
+
+typescriptCopy code
+
+`export const decimals = async (web3: any, token: string) => {
+  if (web3 && token) {
+    let con = erc20(web3, token);
+    if (con) {
+      return await con.methods.decimals().call();
+    }
+  }
+  return null;
+};`
+
+Parameters:
+
+-   `web3`: A web3 instance.
+-   `token`: The contract address of the ERC20 token.
+
+Returns: The number of decimals of the token as a promise or null if inputs are invalid.
+
+Description: This asynchronous function retrieves the number of decimals for a given ERC20 token using its contract instance.
+
+### 3\. removeExponential function
+
+typescriptCopy code
+
+`export const removeExponential = function (n: any) {
+  var sign = +n < 0 ? "-" : "",
+    toStr = n.toString();
+  if (!/e/i.test(toStr)) {
+    return n;
+  }
+  var [lead, decimal, pow] = n
+    .toString()
+    .replace(/^-/, "")
+    .replace(/^([0-9]+)(e.*)/, "$1.$2")
+    .split(/e|\./);
+  return +pow < 0
+    ? sign +
+        "0." +
+        "0".repeat(Math.max(Math.abs(pow) - 1 || 0, 0)) +
+        lead +
+        decimal
+    : sign +
+        lead +
+        (+pow >= decimal.length
+          ? decimal + "0".repeat(Math.max(+pow - decimal.length || 0, 0))
+          : decimal.slice(0, +pow) + "." + decimal.slice(+pow));
+};`
+
+Parameters:
+
+-   `n`: A number in exponential form.
+
+Returns: A string representing the number in non-exponential form.
+
+Description: Converts a number from exponential notation to a normal string representation without exponential notation, especially useful for displaying numbers in user interfaces.
+
+### 4\. numberIntoDecimals function
+
+typescriptCopy code
+
+`export const numberIntoDecimals = function (amount: any, decimal: any) {
+  let formattedValue = ethers.utils.parseUnits(amount.toString(), decimal);
+  formattedValue = removeExponential(formattedValue.toString());
+  return formattedValue;
+};`
+
+Parameters:
+
+-   `amount`: The amount to convert.
+-   `decimal`: The number of decimals to consider.
+
+Returns: A formatted string of the amount with the specified number of decimals.
+
+Description: Converts a numeric amount into a string representation with a specified number of decimals, applying formatting to remove exponential notation.
+
+### 5\. decimalsIntoNumber function
+
+typescriptCopy code
+
+`export const decimalsIntoNumber = function (amount: any, decimal: any) {
+  const bigNumberValue = ethers.BigNumber.from(amount.toString());
+  let formattedValue = ethers.utils.formatUnits(bigNumberValue, decimal);
+  formattedValue = removeExponential(formattedValue.toString());
+  return formattedValue;
+};`
+
+Parameters:
+
+-   `amount`: The amount in the smallest unit.
+-   `decimal`: The decimal units to convert to.
+
+Returns: A string representing the amount adjusted for the specified decimal places.
+
+Description: Converts a value from its smallest unit representation (like wei in Ethereum) to a human-readable format considering the decimal places.
+
+### 6\. withSlippage function
+
+typescriptCopy code
+
+`export const withSlippage = function (value: any, slippage: number) {
+  let slippageProportion = 100 - slippage;
+  let valueWithSlippage = (value * slippageProportion) / 100;
+  valueWithSlippage = removeExponential(valueWithSlippage.toString());
+  return valueWithSlippage;
+};`
+
+Parameters:
+
+-   `value`: The original value.
+-   `slippage`: The percentage of slippage.
+
+Returns: The value adjusted for the specified slippage percentage.
+
+Description: Adjusts a numeric value by a specified slippage percentage, ensuring that the output is in non-exponential form for better readability.
