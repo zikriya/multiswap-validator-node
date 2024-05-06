@@ -33,7 +33,8 @@ export const getDataForSignature = async (
     token: decodedData.sourceToken,
     amount: decodedData.sourceAmount,
     fundManagerContractAddress: web3Service.getFundManagerAddress(
-      decodedData.targetChainId
+      decodedData.targetChainId,
+      job.data.isCCTP
     ),
     fiberRouterAddress: web3Service.getFiberRouterAddress(
       decodedData.targetChainId

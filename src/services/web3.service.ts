@@ -134,7 +134,7 @@ export const getLogsFromTransactionReceipt = (job: any) => {
 
 const findSwapEvent = (topics: any[], job: any) => {
   let swapEventHash = Web3.utils.sha3(
-    "Swap(address,address,uint256,uint256,uint256,address,address,uint256,bytes32,uint256)"
+    "Swap(address,address,uint256,uint256,uint256,address,address,uint256,bytes32,uint256,uint256)"
   );
   if (job.data.isDestinationNonEVM != null && job.data.isDestinationNonEVM) {
     swapEventHash = Web3.utils.sha3(
@@ -149,10 +149,14 @@ const findSwapEvent = (topics: any[], job: any) => {
   }
 };
 
-export const getFundManagerAddress = (chainId: string) => {
+export const getFundManagerAddress = (chainId: string, isCCTP: boolean) => {
   if (NETWORKS && NETWORKS.length > 0) {
     let item = NETWORKS.find((item: any) => item.chainId === chainId);
-    return item ? item.fundManagerAddress : "";
+    if (isCCTP) {
+      return item ? item.cctpFundManager : "";
+    } else {
+      return item ? item.fundManagerAddress : "";
+    }
   }
   return "";
 };
