@@ -26,7 +26,7 @@ export const getDataForSignature = async (
   decodedData: any,
   transaction: any
 ): Promise<any> => {
-  const withdrawalData = await getValidWithdrawalData(job.data, decodedData);
+  const withdrawalData = await getValidWithdrawalData(job, decodedData);
   const txData = {
     transactionHash: job.returnvalue.transactionHash,
     from: transaction.from,
@@ -67,9 +67,11 @@ export const getDataForSignature = async (
 };
 
 export const getValidWithdrawalData = async (
-  data: any,
+  job: any,
   decodedData: any
 ): Promise<any> => {
+  let data = job.data;
+  let distributedFee = getDistributedFee(job);
   let latestHash = Web3.utils.keccak256(
     data.sourceOneInchData +
       data.destinationOneInchData +
@@ -85,7 +87,8 @@ export const getValidWithdrawalData = async (
       decodedData.sourceChainId,
       decodedData.targetChainId,
       data.destinationAmountIn,
-      decodedData.settledAmount
+      decodedData.settledAmount,
+      distributedFee
     ))
   ) {
     return {
@@ -106,7 +109,8 @@ export const isValidSettledAmount = async (
   sourceChainId: string,
   destinationChainId: string,
   destinationAmountIn: any,
-  settledAmount: any
+  settledAmount: any,
+  distributedFee: string
 ): Promise<boolean> => {
   console.log(
     slippage,
@@ -128,9 +132,11 @@ export const isValidSettledAmount = async (
     web3Service.getFoundaryTokenAddress(destinationChainId)
   );
   settledAmount = decimalsIntoNumber(settledAmount, sDecimal);
+  distributedFee = decimalsIntoNumber(distributedFee, sDecimal);
   destinationAmountIn = decimalsIntoNumber(destinationAmountIn, dDecimal);
-  console.log(settledAmount, destinationAmountIn);
-  if (Big(settledAmount).gte(Big(destinationAmountIn))) {
+  let sdAmount = Big(settledAmount).add(Big(distributedFee));
+  console.log(settledAmount, destinationAmountIn, sdAmount?.toString());
+  if (sdAmount.gte(Big(destinationAmountIn))) {
     return true;
   }
   return false;
@@ -389,4 +395,17 @@ const getDecodedLogsDataIntoString = (decodedData: any): string => {
     console.log(e);
   }
   return "";
+};
+
+const getDistributedFee = (job: any): string => {
+  try {
+    let logs = web3Service.getLogsFromTransactionReceipt(job, true);
+    if (logs) {
+      console.log("getDistributedFee logs", logs);
+      return logs?.totalFee ? logs?.totalFee : "0";
+    }
+  } catch (e) {
+    console.log(e);
+  }
+  return "0";
 };
