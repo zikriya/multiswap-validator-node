@@ -32,6 +32,7 @@ export async function fetchChainDataFromNetwork(tx: any) {
       destinationChaibId: destinationNetwork.chainId,
       slippage: tx.slippage,
       isCCTP: tx?.isCCTP ? tx?.isCCTP : false,
+      minDestinationAmountIn: tx?.minDestinationAmountIn,
     };
 
     let job: any = { data: data, transaction: tx };
@@ -76,6 +77,7 @@ async function verifyAndCreateSignature(job: any) {
     await updateTransaction(job, signedData, tx);
   } catch (error) {
     console.error("error occured", error);
+    await updateTransaction(job, null, null);
   }
 }
 
