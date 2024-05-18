@@ -33,6 +33,7 @@ export async function fetchChainDataFromNetwork(tx: any) {
       slippage: tx.slippage,
       isCCTP: tx?.isCCTP ? tx?.isCCTP : false,
       minDestinationAmountIn: tx?.minDestinationAmountIn,
+      dbSettledAmount: tx?.settledAmount,
     };
 
     let job: any = { data: data, transaction: tx };
