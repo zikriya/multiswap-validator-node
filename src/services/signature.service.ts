@@ -22,7 +22,6 @@ import {
   decimals,
   decimalsIntoNumber,
   numberIntoDecimals,
-  removeDecimals,
   withSlippage,
 } from "../constants/utils";
 import { getAggregateRouterTokenAddress } from "./web3.service";
@@ -93,7 +92,8 @@ export const getValidWithdrawalData = async (
     data.destinationAmountIn,
     data.minDestinationAmountIn,
     decodedData.settledAmount,
-    distributedFee
+    distributedFee,
+    job.data.dbSettledAmount
   );
   console.log({ isValid, destinationAmountIn });
   console.log(latestHash, decodedData?.withdrawalData);
@@ -118,7 +118,8 @@ export const isValidSettledAmount = async (
   destinationAmountIn: string,
   minDestinationAmountIn: any,
   settledAmount: any,
-  distributedFee: string
+  distributedFee: string,
+  dbSettledAmount: string
 ): Promise<any> => {
   console.log(
     slippage,
@@ -140,8 +141,7 @@ export const isValidSettledAmount = async (
     dWeb3,
     web3Service.getFoundaryTokenAddress(destinationChainId)
   );
-  let settledAmountInDesDeciamls = decimalsIntoNumber(settledAmount, dDecimal);
-  settledAmountInDesDeciamls = removeDecimals(settledAmountInDesDeciamls);
+  dbSettledAmount = decimalsIntoNumber(dbSettledAmount, sDecimal);
   settledAmount = decimalsIntoNumber(settledAmount, sDecimal);
   distributedFee = decimalsIntoNumber(distributedFee, sDecimal);
   destinationAmountIn = decimalsIntoNumber(destinationAmountIn, dDecimal);
@@ -152,11 +152,12 @@ export const isValidSettledAmount = async (
     minDestinationAmountIn,
     sdAmount?.toString(),
     destinationAmountIn,
-    settledAmountInDesDeciamls
+    "dbSettledAmount",
+    dbSettledAmount
   );
   if (
     sdAmount.gte(Big(minDestinationAmountIn)) &&
-    Big(destinationAmountIn).eq(Big(settledAmountInDesDeciamls))
+    Big(dbSettledAmount).eq(Big(settledAmount))
   ) {
     destinationAmountIn = numberIntoDecimals(settledAmount, dDecimal);
     return { isValid: true, destinationAmountIn };
