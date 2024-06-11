@@ -67,7 +67,3 @@ Here is a detailed documentation of each function and element in the `logger.ts`
         -   `winston.format.printf()`: Formats the log messages to display the level and message.
     -   transports:
         -   Console: Configures the logger to output to the console. `stderrLevels` is set to include "error", meaning `error` level logs will be output to `stderr` instead of `stdout`.
-
-#### Export
-
--   The `logger` instance is exported as a default export from the module, allowing it to be easily imported and used throughout the application.
